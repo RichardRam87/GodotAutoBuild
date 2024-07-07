@@ -46,25 +46,27 @@ jobs:
           report-name: test_report.xml
 
   
-  windows-build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [Windows Desktop]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-      - name: Build
-        id: build
-        uses: manleydev/build-godot-action@v1.5.0
-        with:
-          name: example
-          preset: ${{ matrix.platform }}
-          debugMode: "true"
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Client - ${{ matrix.platform }}
-          path: ${{ github.workspace }}/${{ steps.build.outputs.build }}
-    
+  export-windows:
+      name: Windows Export
+      runs-on: ubuntu-20.04
+      container:
+        image: barichello/godot-ci:4.2.2
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            lfs: true
+        - name: Setup
+          run: |
+            mkdir -v -p ~/.local/share/godot/export_templates/
+            mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+        - name: Windows Build
+          run: |
+            mkdir -v -p build/windows
+            godot --headless --verbose --export-release "Windows Desktop" ../build/windows/$EXPORT_NAME.exe
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: windows
+            path: Build/Windows
+      
