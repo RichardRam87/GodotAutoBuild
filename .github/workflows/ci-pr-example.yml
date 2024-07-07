@@ -28,13 +28,23 @@ jobs:
       statuses: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           lfs: true
-      - uses: MikeSchulze/gdUnit4-action@v1.1.1
+          
+      - name: GDUnit4-Action
+        uses: MikeSchulze/gdUnit4-action@v1.1.1
         with:
           godot-version: '4.2.2'
           paths: |
             res://test/
           timeout: 5
-          report-name: test_report.xml      
+          report-name: test_report.xml
+          
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test Report
+          path: test_report.xml
+    
